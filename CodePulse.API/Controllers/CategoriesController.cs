@@ -17,6 +17,7 @@ namespace CodePulse.API.Controllers
 		{
 			_context = context;
 		}
+
 		[HttpPost]
 		public async Task<IActionResult> CreateCategory(CreateCategoryRequestDto request)
 		{
