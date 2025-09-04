@@ -150,7 +150,7 @@ namespace CodePulse.API.Controllers
 			foreach (var categoryGuid in request.Categories)
 			{
 				var existingCategory = await categoryRepository.GetById(categoryGuid);
-				if(existingCategory is not null)
+				if (existingCategory is not null)
 				{
 					blogPost.Categories.Add(existingCategory);
 				}
@@ -180,6 +180,31 @@ namespace CodePulse.API.Controllers
 					Name = x.Name,
 					UrlHandle = x.UrlHandle
 				}).ToList()
+			};
+
+			return Ok(response);
+		}
+
+		[HttpDelete("{id:guid}")]
+		public async Task<IActionResult> DeleteBlogPost([FromRoute] Guid id)
+		{
+			var deletedBlogPost = await blogPostRepository.DeleteAsync(id);
+			if (deletedBlogPost is null)
+			{
+				return NotFound();
+			}
+
+			var response = new BlogPostDto()
+			{
+				Id = deletedBlogPost.Id,
+				Title = deletedBlogPost.Title,
+				ShortDescription = deletedBlogPost.ShortDescription,
+				Content = deletedBlogPost.Content,
+				FeaturedImageUrl = deletedBlogPost.FeaturedImageUrl,
+				UrlHandle = deletedBlogPost.UrlHandle,
+				PublishedDate = deletedBlogPost.PublishedDate,
+				Author = deletedBlogPost.Author,
+				IsVisible = deletedBlogPost.IsVisible
 			};
 
 			return Ok(response);
