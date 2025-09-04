@@ -21,7 +21,7 @@ namespace CodePulse.API.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> CreateCategory(CreateCategoryRequestDto request)
+		public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequestDto request)
 		{
 			var category = new Category
 			{
@@ -54,6 +54,26 @@ namespace CodePulse.API.Controllers
 					UrlHandle = category.UrlHandle
 				});
 			}
+
+			return Ok(response);
+		}
+
+		[HttpGet("{id:guid}")]
+		public async Task<IActionResult> GetCategoryById([FromRoute] Guid id)
+		{
+			var existingCategory = await categoryRepository.GetById(id);
+
+			if (existingCategory is null)
+			{
+				return NotFound();
+			}
+
+			var response = new CategoryDto()
+			{
+				Id = existingCategory.Id,
+				Name = existingCategory.Name,
+				UrlHandle = existingCategory.UrlHandle
+			};
 
 			return Ok(response);
 		}
