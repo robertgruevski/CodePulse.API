@@ -21,9 +21,13 @@ namespace CodePulse.API.Repositories.Implementation
 			return blogPost;
 		}
 
-		public async Task<IEnumerable<BlogPost>> GetAllAsync() 
-		{ 
-			return await context.BlogPosts.Include(x => x.Categories).ToListAsync(); 
+		public async Task<IEnumerable<BlogPost>> GetAllAsync()
+		{
+			return await context.BlogPosts.Include(x => x.Categories).ToListAsync();
+		}
+		public async Task<BlogPost?> GetByIdAsync(Guid id)
+		{
+			return await context.BlogPosts.Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == id);
 		}
 	}
 }
