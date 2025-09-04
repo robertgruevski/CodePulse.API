@@ -11,11 +11,13 @@ namespace CodePulse.API.Controllers
 	public class BlogPostsController : ControllerBase
 	{
 		private readonly IBlogPostRepository blogPostRepository;
-
-		public BlogPostsController(IBlogPostRepository blogPostRepository)
+		private readonly ICategoryRepository categoryRepository;
+		public BlogPostsController(IBlogPostRepository blogPostRepository, ICategoryRepository categoryRepository)
 		{
 			this.blogPostRepository = blogPostRepository;
+			this.categoryRepository = categoryRepository;
 		}
+
 
 		[HttpPost]
 		public async Task<IActionResult> CreateBlogPost([FromBody] CreateBlogPostRequestDto request)
@@ -29,8 +31,19 @@ namespace CodePulse.API.Controllers
 				UrlHandle = request.UrlHandle,
 				PublishedDate = request.PublishedDate,
 				Author = request.Author,
-				IsVisible = request.IsVisible
+				IsVisible = request.IsVisible,
+				Categories = new List<Category>()
 			};
+
+			foreach (var categoryGuid in request.Categories)
+			{
+				var existingCategory = await categoryRepository.GetById(categoryGuid);
+				if(existingCategory is not null)
+				{
+					blogPost.Categories.Add(existingCategory);
+				}
+			}
+
 			blogPost = await blogPostRepository.CreateAsync(blogPost);
 
 			var response = new BlogPostDto()
@@ -43,7 +56,13 @@ namespace CodePulse.API.Controllers
 				UrlHandle = blogPost.UrlHandle,
 				PublishedDate = blogPost.PublishedDate,
 				Author = blogPost.Author,
-				IsVisible = blogPost.IsVisible
+				IsVisible = blogPost.IsVisible,
+				Categories = blogPost.Categories.Select(x => new CategoryDto
+				{
+					Id = x.Id,
+					Name = x.Name,
+					UrlHandle = x.UrlHandle
+				}).ToList()
 			};
 
 			return Ok(response);
