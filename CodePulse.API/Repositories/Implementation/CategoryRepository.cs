@@ -24,5 +24,17 @@ namespace CodePulse.API.Repositories.Implementation
 		public async Task<IEnumerable<Category>> GetAllAsync() => await context.Categories.ToListAsync();
 
 		public async Task<Category?> GetById(Guid id) => await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+
+		public async Task<Category?> UpdateAsync(Category category)
+		{
+			var exisitingCategory = await context.Categories.FirstOrDefaultAsync(x => x.Id == category.Id);
+			if(exisitingCategory is not null)
+			{
+				context.Entry(exisitingCategory).CurrentValues.SetValues(category);
+				await context.SaveChangesAsync();
+				return category;
+			}
+			return null;
+		}
 	}
 }
