@@ -21,6 +21,21 @@ namespace CodePulse.API.Repositories.Implementation
 			return category;
 		}
 
+		public async Task<Category?> DeleteAsync(Guid id)
+		{
+			var existingCategory = await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+			if(existingCategory is null)
+			{
+				return null;
+			}
+			else
+			{
+				context.Categories.Remove(existingCategory);
+				await context.SaveChangesAsync();
+				return existingCategory;
+			}
+		}
+
 		public async Task<IEnumerable<Category>> GetAllAsync() => await context.Categories.ToListAsync();
 
 		public async Task<Category?> GetById(Guid id) => await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
